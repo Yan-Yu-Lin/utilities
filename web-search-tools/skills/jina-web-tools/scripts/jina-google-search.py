@@ -27,7 +27,6 @@ FILTER_DOMAINS = [
     "ytimg.com",
     "googleapis.com",
     "googleusercontent.com",
-    "youtube.com",
 ]
 
 
