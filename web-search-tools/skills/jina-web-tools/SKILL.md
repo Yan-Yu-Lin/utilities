@@ -251,4 +251,47 @@ If Jina returns incomplete content (heavy JavaScript, authentication), try Firec
 
 ## Resources
 
-- `scripts/jina-google-search.py` - Google search script with title/description extraction (recommended)
+- `scripts/jina-google-search.py` - Google search script with title/description extraction
+- `scripts/youtube-transcript.py` - YouTube transcript/subtitle downloader
+
+---
+
+## YouTube Transcripts
+
+Download transcripts from YouTube videos:
+
+```bash
+uv run ./scripts/youtube-transcript.py "https://youtube.com/watch?v=VIDEO_ID"
+```
+
+### Options
+
+```bash
+# Specify language
+uv run ./scripts/youtube-transcript.py "URL" --lang zh-Hant
+
+# List available languages
+uv run ./scripts/youtube-transcript.py "URL" --list-langs
+
+# JSON output (includes metadata)
+uv run ./scripts/youtube-transcript.py "URL" --json
+
+# Quiet mode (no progress messages)
+uv run ./scripts/youtube-transcript.py "URL" --quiet
+
+# Copy to clipboard
+uv run ./scripts/youtube-transcript.py "URL" --copy
+```
+
+### JSON Output
+
+```json
+{
+  "title": "Video Title",
+  "video_id": "abc123",
+  "channel": "Channel Name",
+  "duration": 213,
+  "language": "en",
+  "transcript": "Full transcript text..."
+}
+```
