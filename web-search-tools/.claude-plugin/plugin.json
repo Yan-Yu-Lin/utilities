@@ -1,10 +1,10 @@
 {
   "name": "web-search-tools",
-  "version": "1.0.0",
-  "description": "Web access and search tools using Jina AI's Reader API - fetch pages, scrape content, search Google via curl",
+  "version": "1.1.0",
+  "description": "Web scraping via Jina, Google search, YouTube transcript & channel tools",
   "author": {
     "name": "Yan-Yu-Lin"
   },
-  "keywords": ["web-search", "jina", "google", "search", "utility"],
+  "keywords": ["web-search", "jina", "google", "youtube", "transcript", "utility"],
   "license": "MIT"
 }
