@@ -220,6 +220,35 @@ The `sed -n '/PATTERN/,$p'` prints from the matching line to the end.
 - Rate limited by Jina's free tier
 - Some JavaScript-heavy sites may not render fully
 
+---
+
+## When to Use Firecrawl
+
+Use Jina as the default. Fall back to Firecrawl when:
+
+### Site mapping with metadata
+
+To discover all URLs on a site with titles and descriptions, use Firecrawl's map feature:
+
+```
+firecrawl_map("https://example.com/blog")
+```
+
+Then scrape the discovered URLs with Jina.
+
+### Content not rendering
+
+If Jina returns incomplete content (heavy JavaScript, authentication), try Firecrawl scrape as fallback.
+
+### Summary
+
+| Task | Default | Fallback |
+|------|---------|----------|
+| Fetch a page | Jina | Firecrawl scrape |
+| Extract links from page | Jina + grep | - |
+| Map entire site with metadata | Firecrawl map | - |
+| Scrape mapped URLs | Jina | Firecrawl scrape |
+
 ## Resources
 
 - `scripts/jina-google-search.py` - Google search script with title/description extraction (recommended)
