@@ -253,6 +253,7 @@ If Jina returns incomplete content (heavy JavaScript, authentication), try Firec
 
 - `scripts/jina-google-search.py` - Google search script with title/description extraction
 - `scripts/youtube-transcript.py` - YouTube transcript/subtitle downloader
+- `scripts/youtube-channel.py` - YouTube channel explorer
 
 ---
 
@@ -293,5 +294,66 @@ uv run ./scripts/youtube-transcript.py "URL" --copy
   "duration": 213,
   "language": "en",
   "transcript": "Full transcript text..."
+}
+```
+
+---
+
+## YouTube Channel Explorer
+
+Explore a YouTuber's channel - list videos, search, sort by views:
+
+```bash
+uv run ./scripts/youtube-channel.py "@ChannelHandle"
+uv run ./scripts/youtube-channel.py "https://youtube.com/@ChannelHandle"
+```
+
+### Options
+
+```bash
+# Limit results
+uv run ./scripts/youtube-channel.py "@Channel" --limit 10
+
+# Sort by views (find popular videos)
+uv run ./scripts/youtube-channel.py "@Channel" --sort views
+
+# Search by keyword
+uv run ./scripts/youtube-channel.py "@Channel" --search "topic"
+
+# List shorts or streams
+uv run ./scripts/youtube-channel.py "@Channel" --type shorts
+
+# JSON output
+uv run ./scripts/youtube-channel.py "@Channel" --json
+
+# Get video IDs only (for piping)
+uv run ./scripts/youtube-channel.py "@Channel" --ids-only
+```
+
+### Chaining with Transcript Download
+
+```bash
+# Get top 5 most viewed videos and download their transcripts
+uv run ./scripts/youtube-channel.py "@Channel" --sort views --limit 5 --ids-only | while read id; do
+  uv run ./scripts/youtube-transcript.py "https://youtube.com/watch?v=$id" --quiet
+done
+```
+
+### JSON Output
+
+```json
+{
+  "channel": "Channel Name",
+  "total_count": 150,
+  "returned_count": 20,
+  "videos": [
+    {
+      "id": "abc123",
+      "title": "Video Title",
+      "url": "https://youtube.com/watch?v=abc123",
+      "duration_human": "12:34",
+      "views": 50000
+    }
+  ]
 }
 ```
