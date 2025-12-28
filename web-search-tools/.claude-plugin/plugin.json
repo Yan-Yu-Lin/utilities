@@ -1,7 +1,7 @@
 {
   "name": "web-search-tools",
   "version": "1.0.0",
-  "description": "Web search and information retrieval tools including Jina AI search capabilities",
+  "description": "Web access and search tools using Jina AI's Reader API - fetch pages, scrape content, search Google via curl",
   "author": {
     "name": "Yan-Yu-Lin"
   },
