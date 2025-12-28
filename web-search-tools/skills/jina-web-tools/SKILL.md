@@ -1,27 +1,30 @@
 ---
 name: jina-web-tools
-description: This skill teaches how to use Jina AI's Reader API (r.jina.ai) for web access via curl. Use when WebFetch or Firecrawl are unavailable, blocked, or when a lightweight curl-based approach is preferred. Covers fetching pages as markdown, scraping content, searching Google, and accessing APIs.
+description: Use Jina AI's Reader API (r.jina.ai) for web scraping and Google searches. Recommended approach for fetching web content - free, reliable, no API key required. Use the included script for Google searches.
 ---
 
 # Jina Web Tools
 
 ## Overview
 
-Jina's Reader API (`r.jina.ai`) converts any URL to clean, readable content. By prefixing any URL with `https://r.jina.ai/`, the content is fetched and returned as markdown - accessible via simple `curl` commands.
+Jina's Reader API (`r.jina.ai`) is the recommended way to fetch web content. It's free, requires no API key, and reliably converts any URL to clean markdown.
 
-This skill teaches how to use this technique as a flexible alternative to WebFetch or Firecrawl.
+Simply prefix any URL with `https://r.jina.ai/` and fetch it with curl:
 
-## When to Use
+```bash
+curl -s "https://r.jina.ai/https://example.com"
+```
 
-- WebFetch or Firecrawl are unavailable or auto-denied
-- Working in restricted environments (subagents, sandboxes)
-- Need lightweight, scriptable web access
-- Want to avoid API rate limits from other services
-- Building pipelines that chain curl commands
+### Why Jina?
+
+- **Free** - No API key, no payment required
+- **Reliable** - Less likely to be blocked than other methods
+- **Simple** - Just curl, no complex setup
+- **Clean output** - Returns well-formatted markdown
 
 ---
 
-## Basic: Fetching Web Pages
+## Fetching Web Pages
 
 Prefix any URL with `https://r.jina.ai/` to get its content as markdown:
 
@@ -38,7 +41,8 @@ curl -s "https://r.jina.ai/https://github.com/openai/openai-node"
 
 ### Output Format
 
-Jina returns:
+Jina returns content like this:
+
 ```
 Title: Page Title
 
@@ -49,77 +53,74 @@ Markdown Content:
 Content converted to markdown...
 ```
 
----
-
-## Intermediate: Extracting Specific Content
-
-### Get just the content (skip headers)
+### Extracting Content
 
 ```bash
+# Skip the header lines, get just content
 curl -s "https://r.jina.ai/https://example.com" | tail -n +6
-```
 
-### Extract links from a page
-
-```bash
+# Extract links from a page
 curl -s "https://r.jina.ai/https://example.com" \
   | grep -oE '\[.*\]\(https://[^)]+\)' \
   | head -20
-```
 
-### Limit output length
-
-```bash
+# Limit output length
 curl -s "https://r.jina.ai/https://example.com" | head -100
 ```
 
 ---
 
-## Advanced: Google Search via Jina
+## Google Search
 
-Jina can fetch Google search results, which can be filtered to extract clean URLs.
-
-### Basic Google search
+**Use the included script for Google searches.** It handles URL encoding, filters out noise (Google UI, images, tracking), and returns clean, deduplicated URLs.
 
 ```bash
-curl -s "https://r.jina.ai/https://www.google.com/search?q=your+query+here"
+./scripts/jina-google-search.sh "your search query"
 ```
 
-### Clean Google search (extract URLs only)
+### Features
+
+- Automatically URL-encodes the query
+- Filters out Google UI noise, images, videos
+- Removes tracking parameters and fragments
+- Returns deduplicated, clean URLs
+- Supports all Google search operators
+
+### Examples
 
 ```bash
-curl -s "https://r.jina.ai/https://www.google.com/search?q=your+query" \
-  | grep -oE '\]\(https://[^)]+\)' \
-  | grep -v "google.com\|blob:" \
-  | grep -v "gstatic.com\|ytimg.com\|\.png\|\.jpg\|\.svg\|\.gif" \
-  | grep -v "youtube.com/watch" \
-  | sed 's/\](//' \
-  | sed 's/)$//' \
-  | sed 's/#.*//' \
-  | sed 's/?.*//' \
-  | sort -u
-```
+# Basic search
+./scripts/jina-google-search.sh "anthropic claude api"
 
-### Using Google search operators
-
-```bash
-# Site-specific
-curl -s "https://r.jina.ai/https://www.google.com/search?q=openai+api+site:github.com"
+# Site-specific search
+./scripts/jina-google-search.sh "openai api site:github.com"
 
 # Exclude sites
-curl -s "https://r.jina.ai/https://www.google.com/search?q=claude+api+-site:reddit.com"
+./scripts/jina-google-search.sh "claude api -site:reddit.com"
 
-# File type
-curl -s "https://r.jina.ai/https://www.google.com/search?q=machine+learning+filetype:pdf"
+# File type search
+./scripts/jina-google-search.sh "machine learning filetype:pdf"
+
+# Exact phrase
+./scripts/jina-google-search.sh "\"openai python sdk\""
+```
+
+### Output
+
+```
+https://github.com/anthropics/anthropic-sdk-python
+https://github.com/anthropics/anthropic-cookbook
+https://docs.anthropic.com/en/api/getting-started
+...
 ```
 
 ---
 
-## Advanced: Accessing APIs via Jina
+## Accessing APIs
 
 Jina passes through JSON from APIs. Use `sed` to extract the JSON, then parse with `jq`.
 
-### GitHub API example
+### GitHub API Example
 
 ```bash
 # Search GitHub repos
@@ -128,7 +129,7 @@ curl -s "https://r.jina.ai/https://api.github.com/search/repositories?q=org:open
   | jq -r '.items[] | "\(.full_name) - \(.stargazers_count) stars"'
 ```
 
-### Get raw files from GitHub
+### Get Raw Files from GitHub
 
 ```bash
 curl -s "https://r.jina.ai/https://raw.githubusercontent.com/openai/openai-node/master/README.md"
@@ -136,64 +137,26 @@ curl -s "https://r.jina.ai/https://raw.githubusercontent.com/openai/openai-node/
 
 ---
 
-## Utility Script: jina-google-search.sh
+## Tips
 
-A pre-built script for clean Google searches is included:
+### Save to file
 
-```bash
-./scripts/jina-google-search.sh "your search query"
-```
-
-### Features
-- URL encodes the query automatically
-- Filters out Google UI noise, images, videos
-- Returns deduplicated, clean URLs
-- Supports all Google search operators
-
-### Example
-
-```bash
-./scripts/jina-google-search.sh "anthropic claude api site:github.com"
-```
-
-Output:
-```
-https://github.com/anthropics/anthropic-sdk-python
-https://github.com/anthropics/anthropic-cookbook
-...
-```
-
----
-
-## Comparison with Other Tools
-
-| Feature | Jina + curl | WebFetch | Firecrawl |
-|---------|-------------|----------|-----------|
-| No API key needed | Yes | Yes | No |
-| Works in subagents | Yes | Sometimes denied | Sometimes denied |
-| Returns markdown | Yes | Yes | Yes |
-| Scriptable/pipeable | Excellent | Limited | Limited |
-| Google search | Yes (with filtering) | No | Yes |
-| Rate limits | Jina free tier | Built-in | API limits |
-
----
-
-## Tips & Patterns
-
-### Chain with other tools
-```bash
-# Find URLs, then scrape with Firecrawl
-./scripts/jina-google-search.sh "topic" | head -3 | xargs -I {} firecrawl scrape {}
-```
-
-### Save results to file
 ```bash
 curl -s "https://r.jina.ai/https://example.com" > page.md
 ```
 
-### Use in pipelines
+### Chain with other tools
+
 ```bash
-# Get all OpenAI repos and clone them
+# Search, then scrape top results
+./scripts/jina-google-search.sh "topic" | head -3 | while read url; do
+  curl -s "https://r.jina.ai/$url"
+done
+```
+
+### Clone repos from search
+
+```bash
 curl -s "https://r.jina.ai/https://api.github.com/search/repositories?q=org:openai" \
   | sed -n '/^{/,$p' \
   | jq -r '.items[].clone_url' \
@@ -202,15 +165,23 @@ curl -s "https://r.jina.ai/https://api.github.com/search/repositories?q=org:open
 
 ---
 
+## Handling Large Pages
+
+If a page gets truncated, continue reading from the last line you remember:
+
+```bash
+curl -s "https://r.jina.ai/https://example.com" | sed -n '/last line you remember/,$p'
+```
+
+The `sed -n '/PATTERN/,$p'` prints from the matching line to the end.
+
+---
+
 ## Limitations
 
 - Rate limited by Jina's free tier
 - Some JavaScript-heavy sites may not render fully
-- Large pages may be truncated
-- No authentication passthrough for protected content
 
 ## Resources
 
-### scripts/
-
-- `jina-google-search.sh` - Pre-built clean Google search utility
+- `scripts/jina-google-search.sh` - Google search script (recommended for all Google searches)
