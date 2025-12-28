@@ -59,13 +59,37 @@ Content converted to markdown...
 # Skip the header lines, get just content
 curl -s "https://r.jina.ai/https://example.com" | tail -n +6
 
-# Extract links from a page
-curl -s "https://r.jina.ai/https://example.com" \
-  | grep -oE '\[.*\]\(https://[^)]+\)' \
-  | head -20
-
 # Limit output length
 curl -s "https://r.jina.ai/https://example.com" | head -100
+```
+
+---
+
+## Extracting Links
+
+Extract all links from a page as markdown links `[text](url)`:
+
+```bash
+curl -s "https://r.jina.ai/https://anthropic.com" | grep -oE '\[.*\]\(https?://[^)]+\)'
+```
+
+### Output
+
+```
+[Claude](https://claude.com/product/overview)
+[Claude Code](https://claude.com/product/claude-code)
+[API](https://docs.anthropic.com)
+[Pricing](https://claude.com/pricing)
+...
+```
+
+### Get URLs only
+
+```bash
+curl -s "https://r.jina.ai/https://anthropic.com" \
+  | grep -oE '\[.*\]\(https?://[^)]+\)' \
+  | grep -oE 'https?://[^)]+' \
+  | sort -u
 ```
 
 ---
