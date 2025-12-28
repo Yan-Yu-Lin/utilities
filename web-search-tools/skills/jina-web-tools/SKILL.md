@@ -76,11 +76,13 @@ curl -s "https://r.jina.ai/https://example.com" | head -100
 
 ```bash
 ./scripts/jina-google-search.sh "your search query"
+./scripts/jina-google-search.sh "your search query" 20  # more results
 ```
 
 ### Features
 
 - Automatically URL-encodes the query
+- Optional second argument to control result count
 - Filters out Google UI noise, images, videos
 - Removes tracking parameters and fragments
 - Returns deduplicated, clean URLs
