@@ -72,48 +72,60 @@ curl -s "https://r.jina.ai/https://example.com" | head -100
 
 ## Google Search
 
-**Use the included script for Google searches.** It handles URL encoding, filters out noise (Google UI, images, tracking), and returns clean, deduplicated URLs.
+**Use the included Python script for Google searches.** It handles URL encoding, filters out noise, and returns clean results with titles and descriptions.
 
 ```bash
-./scripts/jina-google-search.sh "your search query"
-./scripts/jina-google-search.sh "your search query" 20  # more results
+uv run ./scripts/jina-google-search.py "your search query"
+uv run ./scripts/jina-google-search.py "your search query" --num 20
+uv run ./scripts/jina-google-search.py "your search query" --json
 ```
 
 ### Features
 
-- Automatically URL-encodes the query
-- Optional second argument to control result count
-- Filters out Google UI noise, images, videos
-- Removes tracking parameters and fragments
-- Returns deduplicated, clean URLs
+- Returns title, URL, and description for each result
+- `--num N` to control result count
+- `--json` for structured JSON output
+- Filters out Google UI noise, images, ads
 - Supports all Google search operators
 
 ### Examples
 
 ```bash
 # Basic search
-./scripts/jina-google-search.sh "anthropic claude api"
+uv run ./scripts/jina-google-search.py "anthropic claude api"
 
 # Site-specific search
-./scripts/jina-google-search.sh "openai api site:github.com"
+uv run ./scripts/jina-google-search.py "openai api site:github.com"
 
-# Exclude sites
-./scripts/jina-google-search.sh "claude api -site:reddit.com"
+# JSON output
+uv run ./scripts/jina-google-search.py "claude api" --json
 
-# File type search
-./scripts/jina-google-search.sh "machine learning filetype:pdf"
-
-# Exact phrase
-./scripts/jina-google-search.sh "\"openai python sdk\""
+# More results
+uv run ./scripts/jina-google-search.py "machine learning" --num 20
 ```
 
 ### Output
 
 ```
-https://github.com/anthropics/anthropic-sdk-python
-https://github.com/anthropics/anthropic-cookbook
-https://docs.anthropic.com/en/api/getting-started
-...
+## Claude
+https://claude.ai/
+Claude is a next generation AI assistant built by Anthropic...
+
+## Introducing Claude
+https://www.anthropic.com/news/introducing-claude
+Claude is a next-generation AI assistant based on Anthropic's research...
+```
+
+### JSON Output
+
+```json
+[
+  {
+    "title": "Claude",
+    "url": "https://claude.ai/",
+    "description": "Claude is a next generation AI assistant..."
+  }
+]
 ```
 
 ---
@@ -150,8 +162,8 @@ curl -s "https://r.jina.ai/https://example.com" > page.md
 ### Chain with other tools
 
 ```bash
-# Search, then scrape top results
-./scripts/jina-google-search.sh "topic" | head -3 | while read url; do
+# Search, get URLs from JSON, then scrape top results
+uv run ./scripts/jina-google-search.py "topic" --json | jq -r '.[0:3][].url' | while read url; do
   curl -s "https://r.jina.ai/$url"
 done
 ```
@@ -186,4 +198,4 @@ The `sed -n '/PATTERN/,$p'` prints from the matching line to the end.
 
 ## Resources
 
-- `scripts/jina-google-search.sh` - Google search script (recommended for all Google searches)
+- `scripts/jina-google-search.py` - Google search script with title/description extraction (recommended)
